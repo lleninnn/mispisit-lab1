@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Детали транзакции #{{ tx.id }}</h2>
+    <div class="card mt-3" style="max-width: 500px;">
+        <div class="card-body">
+            <p><strong>Отправитель:</strong> {{ tx.sender }}</p>
+            <p><strong>Сумма:</strong> {{ tx.amount }} ₽</p>
+            <p><strong>Текущий статус:</strong> {{ tx.status }}</p>
+            <hr>
+            <a href="/transactions/" class="btn btn-secondary">Назад к списку</a>
+        </div>
+    </div>
+{% endblock %}

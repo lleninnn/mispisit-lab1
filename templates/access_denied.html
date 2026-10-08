@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="alert alert-danger mt-4" role="alert">
+        <h4 class="alert-heading">Доступ запрещен!</h4>
+        <p>Вы пытаетесь изменить статус транзакции, которая уже подтверждена как "Фрод" или "Ок". Правила системы запрещают изменять финальный вердикт эксперта.</p>
+        <hr>
+        <a href="/transactions/" class="btn btn-danger">Вернуться к списку</a>
+    </div>
+{% endblock %}
