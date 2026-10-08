@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Панель управления</h1>
+    <p class="lead">Система выявления мошеннических операций. Версия 0.0.2</p>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Транзакции</h5>
+                    <p class="card-text">Просмотр и анализ подозрительных операций.</p>
+                    <a href="/transactions/" class="btn btn-primary">Перейти к списку</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
