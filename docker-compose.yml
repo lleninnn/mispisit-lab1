@@ -29,10 +29,10 @@ services:
       - dbdata:/var/lib/postgresql/data
     healthcheck:
       # Пингуем базу, чтобы убедиться, что СУБД готова принимать запросы
-      test: ["CMD-SHELL", "pg_isready -U postgres -d fraud_db"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
 volumes:
   dbdata:
