@@ -25,10 +25,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      # Именованный том гарантирует сохранность данных при перезапуске
-      - dbdata:/var/lib/postgresql/data
+      - dbdata:/var/lib/postgresql
     healthcheck:
-      # Пингуем базу, чтобы убедиться, что СУБД готова принимать запросы
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
