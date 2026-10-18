@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_NAME=fraud_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+
+  db:
+    image: postgres:18-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=fraud_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      # Именованный том гарантирует сохранность данных при перезапуске
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      # Пингуем базу, чтобы убедиться, что СУБД готова принимать запросы
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fraud_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dbdata:
