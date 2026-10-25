@@ -1,16 +1,166 @@
 {% extends 'base.html' %}
+
+{% block title %}Дашборд | FraudGuard{% endblock %}
+{% block page_title %}Аналитический дашборд безопасности{% endblock %}
+
 {% block content %}
-    <h1>Панель управления</h1>
-    <p class="lead">Система выявления мошеннических операций. Версия 0.0.3</p>
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Транзакции</h5>
-                    <p class="card-text">Просмотр и анализ подозрительных операций.</p>
-                    <a href="/transactions/" class="btn btn-primary">Перейти к списку</a>
+<!-- Карточки ключевых показателей (KPI) -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card kpi-card p-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted small mb-1 fw-medium">Общий объем операций</p>
+                    <h4 class="fw-bold mb-0">{{ total_amount }} ₽</h4>
+                </div>
+                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
+                    <i class="bi bi-cash-stack fs-4"></i>
                 </div>
             </div>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="card kpi-card p-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted small mb-1 fw-medium">Всего транзакций</p>
+                    <h4 class="fw-bold mb-0">{{ total_count }}</h4>
+                </div>
+                <div class="bg-info bg-opacity-10 text-info p-3 rounded-3">
+                    <i class="bi bi-activity fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card p-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted small mb-1 fw-medium">Заблокировано (Фрод)</p>
+                    <h4 class="fw-bold text-danger mb-0">{{ fraud_count }}</h4>
+                </div>
+                <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-3">
+                    <i class="bi bi-shield-exclamation fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card kpi-card p-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted small mb-1 fw-medium">Ожидают проверки</p>
+                    <h4 class="fw-bold text-warning mb-0">{{ pending_count }}</h4>
+                </div>
+                <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
+                    <i class="bi bi-hourglass-split fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- График и последние операции -->
+<div class="row g-4">
+    <!-- Круговая диаграмма Chart.js -->
+    <div class="col-lg-5">
+        <div class="card content-card p-4 h-100">
+            <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2 text-primary"></i>Распределение по статусам</h6>
+            {% if total_count > 0 %}
+                <div class="d-flex justify-content-center align-items-center" style="max-height: 280px;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            {% else %}
+                <div class="text-center text-muted my-auto py-5">
+                    <i class="bi bi-bar-chart fs-1 d-block mb-2"></i>
+                    Нет данных для построения графика
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Лента последних транзакций -->
+    <div class="col-lg-7">
+        <div class="card content-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Последние 5 операций</h6>
+                <a href="/transactions/" class="btn btn-sm btn-outline-primary">Весь реестр <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+
+            {% if recent_txs %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Отправитель</th>
+                            <th>Сумма</th>
+                            <th>Статус</th>
+                            <th class="text-end">Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in recent_txs %}
+                        <tr>
+                            <td class="fw-semibold text-secondary">#{{ tx.id }}</td>
+                            <td class="fw-medium">{{ tx.sender }}</td>
+                            <td>{{ tx.amount }} ₽</td>
+                            <td>
+                                {% if tx.status == 'Фрод' %}
+                                    <span class="badge bg-danger"><i class="bi bi-x-octagon me-1"></i>Фрод</span>
+                                {% elif tx.status == 'Ок' %}
+                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Ок</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i>На проверке</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="/transactions/{{ tx.id }}/" class="btn btn-sm btn-light border">
+                                    Открыть
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                Транзакции отсутствуют. Добавьте первую операцию!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if total_count > 0 %}
+<script>
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Фрод (Заблокировано)', 'Ок (Подтверждено)', 'На проверке'],
+            datasets: [{
+                data: [{{ fraud_count }}, {{ ok_count }}, {{ pending_count }}],
+                backgroundColor: ['#dc3545', '#198754', '#ffc107'],
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20, usePointStyle: true }
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
 {% endblock %}
