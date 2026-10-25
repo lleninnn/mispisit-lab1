@@ -1,13 +1,46 @@
 {% extends 'base.html' %}
+
+{% block title %}Инспекция #{{ tx.id }} | FraudGuard{% endblock %}
+{% block page_title %}Экспертиза транзакции #{{ tx.id }}{% endblock %}
+
 {% block content %}
-    <h2>Детали транзакции #{{ tx.id }}</h2>
-    <div class="card mt-3" style="max-width: 500px;">
-        <div class="card-body">
-            <p><strong>Отправитель:</strong> {{ tx.sender }}</p>
-            <p><strong>Сумма:</strong> {{ tx.amount }} ₽</p>
-            <p><strong>Текущий статус:</strong> {{ tx.status }}</p>
-            <hr>
-            <a href="/transactions/" class="btn btn-secondary">Назад к списку</a>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card content-card p-4">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                <h5 class="fw-bold mb-0">Карточка оперативного контроля</h5>
+                <span class="badge bg-warning text-dark px-3 py-2">
+                    <i class="bi bi-hourglass-split me-1"></i> {{ tx.status }}
+                </span>
+            </div>
+
+            <div class="mb-4">
+                <div class="p-3 bg-light rounded-3 mb-3">
+                    <small class="text-muted d-block">Контрагент (Отправитель):</small>
+                    <span class="fs-5 fw-bold">{{ tx.sender }}</span>
+                </div>
+                <div class="p-3 bg-light rounded-3">
+                    <small class="text-muted d-block">Сумма операции:</small>
+                    <span class="fs-4 fw-bold text-primary">{{ tx.amount }} ₽</span>
+                </div>
+            </div>
+
+            <h6 class="fw-bold mb-3">Вынести экспертный вердикт:</h6>
+            <form method="POST" class="d-grid gap-2 d-md-flex justify-content-md-between">
+                <button type="submit" name="status" value="Ок" class="btn btn-success flex-fill py-2">
+                    <i class="bi bi-check2-circle me-1"></i> Легитимно (Ок)
+                </button>
+                <button type="submit" name="status" value="Фрод" class="btn btn-danger flex-fill py-2">
+                    <i class="bi bi-slash-circle me-1"></i> Блокировать (Фрод)
+                </button>
+            </form>
+
+            <div class="mt-4 pt-3 border-top text-center">
+                <a href="/transactions/" class="text-decoration-none text-secondary small">
+                    <i class="bi bi-arrow-left me-1"></i> Вернуться в реестр без изменений
+                </a>
+            </div>
         </div>
     </div>
+</div>
 {% endblock %}

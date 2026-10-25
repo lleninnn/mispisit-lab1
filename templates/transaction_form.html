@@ -1,16 +1,47 @@
 {% extends 'base.html' %}
+
+{% block title %}Новая операция | FraudGuard{% endblock %}
+{% block page_title %}Регистрация финансовой операции{% endblock %}
+
 {% block content %}
-    <h2>Добавление транзакции</h2>
-    <form method="post" class="mt-3" style="max-width: 400px;">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label class="form-label">Сумма (₽)</label>
-            <input type="number" name="amount" class="form-control" required>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card content-card p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-plus text-primary me-2"></i>Параметры перевода</h5>
+            <p class="text-muted small mb-4">После добавления операция получит статус «На проверке» и поступит в очередь к аналитику безопасности.</p>
+
+            {% if error %}
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <div>{{ error }}</div>
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Отправитель платежа (ФИО или Организация)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-building"></i></span>
+                        <input type="text" name="sender" class="form-control" placeholder='Например: ООО "ТехноИнвест"' required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-medium">Сумма транзакции (₽)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-currency-exchange"></i></span>
+                        <input type="number" step="0.01" min="0.01" name="amount" class="form-control" placeholder="150000.00" required>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/transactions/" class="btn btn-light border">Отмена</a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-send-check me-1"></i> Отправить на проверку
+                    </button>
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Отправитель</label>
-            <input type="text" name="sender" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-success">Добавить</button>
-    </form>
+    </div>
+</div>
 {% endblock %}
