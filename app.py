@@ -15,7 +15,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if not settings.configured:
     settings.configure(
         DEBUG=True,
-        SECRET_KEY='lab3-postgres-secret-key',
+        SECRET_KEY=os.environ.get('SECRET_KEY', 'default-insecure-dev-key'),
         ROOT_URLCONF=__name__,
         ALLOWED_HOSTS=['*'],
         INSTALLED_APPS=[
