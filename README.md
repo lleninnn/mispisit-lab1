@@ -54,7 +54,7 @@ FraudGuard — учебная информационная система для
 
 Репозиторий: https://github.com/lleninnn/mispisit-lab1  
 Ветка: `lab4`  
-Pull Request: https://github.com/lleninnn/mispisit-lab1/pull/НОМЕР  
+Pull Request: https://github.com/lleninnn/mispisit-lab1/pull/6  
 Образ приложения: `lleninnn/mispisit-lab1:0.0.4`  
 Страница образа: https://hub.docker.com/r/lleninnn/mispisit-lab1  
 
