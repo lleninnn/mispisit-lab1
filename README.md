@@ -52,16 +52,16 @@ FraudGuard — учебная информационная система для
 
 ## Запуск проекта
 
-Репозиторий: https://github.com/lleninnn/mispisit-lab1  
+Репозиторий: https://gitverse.ru/lleninnn/mispisit-lab1  
 Ветка: `lab4`  
-Pull Request: https://github.com/lleninnn/mispisit-lab1/pull/6  
+Pull Request: https://gitverse.ru/lleninnn/mispisit-lab1/pull/6  
 Образ приложения: `lleninnn/mispisit-lab1:0.0.4`  
 Страница образа: https://hub.docker.com/r/lleninnn/mispisit-lab1  
 
 Выполните команды:
 
 ```bash
-git clone -b lab4 https://github.com/lleninnn/mispisit-lab1
+git clone -b lab4 https://gitverse.ru/lleninnn/mispisit-lab1
 cd mispisit-lab1
 docker compose up -d
 ```
