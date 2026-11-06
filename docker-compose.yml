@@ -1,5 +1,7 @@
+name: mispisit-nikolskiy
+
 services:
-  web:
+  app:
     image: lleninnn/mispisit-lab1:0.0.4
     ports:
       - "8080:8080"
@@ -7,10 +9,10 @@ services:
       db:
         condition: service_healthy
     environment:
-      - SECRET_KEY=prod-fraudguard-secret-key-2026
-      - DB_NAME=fraud_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - SECRET_KEY=change-me-in-real-use
+      - DB_NAME=app
+      - DB_USER=app
+      - DB_PASSWORD=app
       - DB_HOST=db
       - DB_PORT=5432
 
@@ -18,18 +20,32 @@ services:
     image: postgres:18-alpine
     restart: always
     environment:
-      - POSTGRES_DB=fraud_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5432:5432"
+      - POSTGRES_DB=app
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app
     volumes:
       - dbdata:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
       interval: 10s
       timeout: 5s
       retries: 10
+
+  dashboard:
+    image: grafana/grafana:11.4.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=app
+      - GF_SECURITY_ADMIN_PASSWORD=app
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/fraudguard.json
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   dbdata:

@@ -12,12 +12,26 @@
                     <i class="bi bi-shield-lock-fill display-5"></i>
                 </span>
             </div>
+
             <h4 class="fw-bold mb-2">Редактирование заблокировано</h4>
-            <p class="text-muted mb-4">
-                По транзакции <strong>#{{ tx.id }}</strong> ({{ tx.sender }} на сумму {{ tx.amount }} ₽) уже вынесен финальный вердикт безопасности:
-                <span class="badge {% if tx.status == 'Фрод' %}bg-danger{% else %}bg-success{% endif %}">{{ tx.status }}</span>.
-                Согласно регламенту безопасности, повторная модификация архивных записей запрещена.
-            </p>
+
+            {% if tx %}
+                <p class="text-muted mb-4">
+                    По транзакции <strong>#{{ tx.id }}</strong>
+                    ({{ tx.sender }} на сумму {{ tx.amount }} ₽)
+                    уже вынесен финальный вердикт безопасности:
+                    <span class="badge {% if tx.status == 'Фрод' %}bg-danger{% else %}bg-success{% endif %}">
+                        {{ tx.status }}
+                    </span>.
+                    Повторная модификация архивных записей запрещена.
+                </p>
+            {% else %}
+                <p class="text-muted mb-4">
+                    Система отклонила запрошенное действие, потому что оно нарушает
+                    регламент безопасности или обращается к уже завершённой операции.
+                </p>
+            {% endif %}
+
             <div>
                 <a href="/transactions/" class="btn btn-primary px-4">
                     <i class="bi bi-arrow-left me-2"></i>Вернуться в реестр
