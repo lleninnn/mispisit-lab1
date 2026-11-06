@@ -21,6 +21,7 @@ if not settings.configured:
         ALLOWED_HOSTS=['*'],
         INSTALLED_APPS=[
             __name__,
+            'django.contrib.staticfiles',
         ],
         DATABASES={
             'default': {
@@ -36,10 +37,13 @@ if not settings.configured:
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'DIRS': [os.path.join(BASE_DIR, 'templates')],
         }],
+        STATIC_URL='/static/',
+        STATICFILES_DIRS=[
+            os.path.join(BASE_DIR, 'static'),
+        ],
     )
 
 django.setup()
-
 
 # 2. МОДЕЛЬ ДАННЫХ
 class Transaction(models.Model):
@@ -52,10 +56,9 @@ class Transaction(models.Model):
         managed = False
         db_table = 'transactions'
 
-
-# 3. ИНИЦИАЛИЗАЦИЯ ТАБЛИЦЫ И НАЧАЛЬНЫХ ДАННЫХ
+# 3. ИНИЦИАЛИЗАЦИЯ ТАБЛИЦЫ
 def init_db():
-    """Создает таблицу при старте и наполняет её демо-данными для графиков."""
+    """Создаёт таблицу транзакций при старте, если она ещё не существует."""
     try:
         with connection.cursor() as cursor:
             cursor.execute('''
@@ -66,30 +69,14 @@ def init_db():
                     status VARCHAR(50) NOT NULL
                 )
             ''')
-            cursor.execute('SELECT COUNT(*) FROM transactions')
-            if cursor.fetchone()[0] == 0:
-                sample_data = [
-                    (950000.00, 'ООО "Вектор"', 'Фрод'),
-                    (12500.50, 'ИП Смирнов А.В.', 'Ок'),
-                    (450000.00, 'ПАО "ТехноСбыт"', 'На проверке'),
-                    (3200.00, 'Антонов К.С.', 'Ок'),
-                    (1850000.00, 'Оффшор ЛТД "Голд"', 'Фрод'),
-                    (89000.00, 'ООО "Ромашка"', 'На проверке'),
-                ]
-                cursor.executemany(
-                    'INSERT INTO transactions (amount, sender, status) VALUES (%s, %s, %s)',
-                    sample_data
-                )
     except Exception as e:
-        print(f"[ Warning ] Ожидание готовности СУБД PostgreSQL 18: {e}")
-
+        print(f"[ Warning ] Не удалось инициализировать таблицу transactions: {e}")
 
 init_db()
 
-
 # 4. ПРЕДСТАВЛЕНИЯ (VIEWS)
 def index(request):
-    """Главная страница: Аналитический Дашборд со статистикой."""
+    """Главная страница: аналитический дашборд приложения."""
     try:
         total_count = Transaction.objects.count()
         fraud_count = Transaction.objects.filter(status='Фрод').count()
@@ -113,12 +100,10 @@ def index(request):
     }
     return render(request, 'index.html', context)
 
-
 def transaction_list(request):
-    """Реестр всех транзакций для анализа в DataTables."""
+    """Реестр всех транзакций."""
     transactions = Transaction.objects.all().order_by('-id')
     return render(request, 'transaction_list.html', {'transactions': transactions})
-
 
 def transaction_new(request):
     """Форма регистрации новой транзакции с валидацией данных."""
@@ -145,7 +130,6 @@ def transaction_new(request):
 
     return render(request, 'transaction_form.html', {'error': error})
 
-
 def transaction_detail(request, tx_id):
     """Карточка проверки транзакции и вынесения вердикта аналитиком."""
     try:
@@ -153,7 +137,6 @@ def transaction_detail(request, tx_id):
     except Transaction.DoesNotExist:
         return HttpResponseRedirect('/transactions/')
 
-    # Защита: если вердикт уже вынесен, блокируем повторное изменение
     if tx.status in ['Фрод', 'Ок']:
         return render(request, 'access_denied.html', {'tx': tx})
 
@@ -166,6 +149,9 @@ def transaction_detail(request, tx_id):
 
     return render(request, 'transaction_detail.html', {'tx': tx})
 
+def access_denied(request):
+    """Отдельная страница ошибочного сценария."""
+    return render(request, 'access_denied.html', {})
 
 # 5. МАРШРУТЫ (URLS)
 urlpatterns = [
@@ -173,6 +159,7 @@ urlpatterns = [
     path('transactions/', transaction_list),
     path('transactions/new/', transaction_new),
     path('transactions/<int:tx_id>/', transaction_detail),
+    path('access-denied/', access_denied),
 ]
 
 if __name__ == '__main__':

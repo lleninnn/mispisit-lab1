@@ -1,0 +1,13 @@
+apiVersion: 1
+
+datasources:
+  - name: app
+    uid: app
+    type: postgres
+    url: db:5432
+    user: app
+    jsonData:
+      database: app
+      sslmode: disable
+    secureJsonData:
+      password: app
